@@ -1,0 +1,14 @@
+*~
+/pkg/
+/tmp/
+*.gemspec
+.gradle/
+/classpath/
+build/
+.idea
+/bin/
+/.settings/
+/.metadata/
+.classpath
+.project
+
