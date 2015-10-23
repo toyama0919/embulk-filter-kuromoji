@@ -69,8 +69,14 @@ public class KuromojiFilterPlugin implements FilterPlugin
 
         for (String key: task.getKeyNames()) {
             for (Map<String, String> setting : task.getSettings()) {
-                Column outputColumn = new Column(i++, key + MoreObjects.firstNonNull(setting.get("suffix"), ""), Types.STRING);
-                builder.add(outputColumn);
+                String keyName = key + MoreObjects.firstNonNull(setting.get("suffix"), "");
+                if (task.getKeepInput()) {
+                    if (setting.get("suffix") != null) {
+                        builder.add(new Column(i++, keyName, Types.STRING));
+                    }
+                } else {
+                    builder.add(new Column(i++, keyName, Types.STRING));
+                }
             }
         }
 
@@ -101,26 +107,24 @@ public class KuromojiFilterPlugin implements FilterPlugin
 
         return new PageOutput() {
             private PageReader reader = new PageReader(inputSchema);
+            private PageBuilder builder = new PageBuilder(Exec.getBufferAllocator(), outputSchema, output);
 
             @Override
             public void finish() {
-                output.finish();
+                builder.finish();
             }
 
             @Override
             public void close() {
-                output.close();
+                builder.close();
             }
 
             @Override
             public void add(Page page) {
                 reader.setPage(page);
-                try (final PageBuilder builder = new PageBuilder(Exec.getBufferAllocator(), outputSchema, output)) {
-                    while (reader.nextRecord()) {
-                        setValue(builder);
-                        builder.addRecord();
-                    }
-                    builder.finish();
+                while (reader.nextRecord()) {
+                    setValue(builder);
+                    builder.addRecord();
                 }
             }
 
