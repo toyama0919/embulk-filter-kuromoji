@@ -43,7 +43,7 @@ public class KuromojiFilterPlugin implements FilterPlugin
         @Config("ok_parts_of_speech")
         @ConfigDefault("null")
         public Optional<List<String>> getOkPartsOfSpeech();
-        
+
         @Config("keep_input")
         @ConfigDefault("true")
         public boolean getKeepInput();
@@ -61,13 +61,13 @@ public class KuromojiFilterPlugin implements FilterPlugin
         ImmutableList.Builder<Column> builder = ImmutableList.builder();
         int i = 0;
         if (task.getKeepInput()) {
-            for (Column inputColumn: inputSchema.getColumns()) {
+            for (Column inputColumn : inputSchema.getColumns()) {
                 Column outputColumn = new Column(i++, inputColumn.getName(), inputColumn.getType());
                 builder.add(outputColumn);
             }
         }
 
-        for (String key: task.getKeyNames()) {
+        for (String key : task.getKeyNames()) {
             for (Map<String, String> setting : task.getSettings()) {
                 String keyName = key + MoreObjects.firstNonNull(setting.get("suffix"), "");
                 if (task.getKeepInput()) {
@@ -133,7 +133,7 @@ public class KuromojiFilterPlugin implements FilterPlugin
              */
             private void setValue(PageBuilder builder) {
                 if (task.getKeepInput()) {
-                    for (Column inputColumn: inputSchema.getColumns()) {
+                    for (Column inputColumn : inputSchema.getColumns()) {
                         if (reader.isNull(inputColumn)) {
                             builder.setNull(inputColumn);
                             continue;
@@ -154,13 +154,13 @@ public class KuromojiFilterPlugin implements FilterPlugin
 
                 for (Column column : keyNameColumns) {
                     List<Token> tokens = tokenizer.tokenize(reader.getString(column));
-                    for (Map<String, String> setting: task.getSettings()) {
+                    for (Map<String, String> setting : task.getSettings()) {
                         String suffix = setting.get("suffix");
                         String method = setting.get("method");
                         Column outputColumn = outputSchema.lookupColumn(column.getName() + MoreObjects.firstNonNull(suffix, ""));
                         List<String> outputs = Lists.newArrayList();
                         for (Token token : tokens) {
-                            if (!isOkPartsOfSpeech(token)) continue;
+                            if (!isOkPartsOfSpeech(token)) { continue; }
                             if ("base_form".equals(method)) {
                                 outputs.add(MoreObjects.firstNonNull(token.getBaseForm(), token.getSurfaceForm()));
                             } else if ("reading".equals(method)) {
@@ -176,7 +176,7 @@ public class KuromojiFilterPlugin implements FilterPlugin
             }
 
             private boolean isOkPartsOfSpeech(Token token) {
-                if (!task.getOkPartsOfSpeech().isPresent()) return true;
+                if (!task.getOkPartsOfSpeech().isPresent()) { return true; };
                 for (String okPartsOfSpeech : task.getOkPartsOfSpeech().get()) {
                     if (token.getAllFeaturesArray()[0].equals(okPartsOfSpeech)) {
                         return true;
