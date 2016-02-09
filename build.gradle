@@ -9,7 +9,6 @@ import com.github.jrubygradle.JRubyExec
 repositories {
     mavenCentral()
     jcenter()
-    maven { url "http://www.atilika.org/nexus/content/repositories/atilika" }    
 }
 configurations {
     provided
@@ -22,7 +21,7 @@ targetCompatibility = 1.7
 
 dependencies {
     compile  "org.embulk:embulk-core:0.8.1"
-    compile 'org.atilika.kuromoji:kuromoji:0.7.7'
+    compile 'com.atilika.kuromoji:kuromoji-ipadic:0.9.0'
     provided "org.embulk:embulk-core:0.8.1"
     testCompile "junit:junit:4.+"
 }

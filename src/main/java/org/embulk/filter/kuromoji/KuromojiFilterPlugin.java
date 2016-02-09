@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import org.atilika.kuromoji.Token;
-import org.atilika.kuromoji.Tokenizer;
-import org.atilika.kuromoji.Tokenizer.Builder;
+import com.atilika.kuromoji.ipadic.Token;
+import com.atilika.kuromoji.ipadic.Tokenizer;
+import com.atilika.kuromoji.ipadic.Tokenizer.Builder;
 import org.embulk.config.Config;
 import org.embulk.config.ConfigDefault;
 import org.embulk.config.ConfigSource;
@@ -88,7 +88,8 @@ public class KuromojiFilterPlugin implements FilterPlugin
     public PageOutput open(TaskSource taskSource, final Schema inputSchema, final Schema outputSchema, final PageOutput output)
     {
         final PluginTask task = taskSource.loadTask(PluginTask.class);
-        Builder builder = Tokenizer.builder();
+
+        Builder builder = new Tokenizer.Builder();
         if (task.getDictionaryPath().isPresent()) {
             try {
                 builder.userDictionary(task.getDictionaryPath().get());
@@ -162,11 +163,11 @@ public class KuromojiFilterPlugin implements FilterPlugin
                         for (Token token : tokens) {
                             if (!isOkPartsOfSpeech(token)) { continue; }
                             if ("base_form".equals(method)) {
-                                outputs.add(MoreObjects.firstNonNull(token.getBaseForm(), token.getSurfaceForm()));
+                                outputs.add(MoreObjects.firstNonNull(token.getBaseForm(), token.getSurface()));
                             } else if ("reading".equals(method)) {
-                                outputs.add(MoreObjects.firstNonNull(token.getReading(), token.getSurfaceForm()));
+                                outputs.add(MoreObjects.firstNonNull(token.getReading(), token.getSurface()));
                             } else if ("surface_form".equals(method)) {
-                                outputs.add(token.getSurfaceForm());
+                                outputs.add(token.getSurface());
                             }
                         }
                         Joiner joiner = Joiner.on(MoreObjects.firstNonNull(setting.get("delimiter"), ",")).skipNulls();
