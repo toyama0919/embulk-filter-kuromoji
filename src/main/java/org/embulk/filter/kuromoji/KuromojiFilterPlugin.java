@@ -5,9 +5,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import com.atilika.kuromoji.ipadic.Token;
-import com.atilika.kuromoji.ipadic.Tokenizer;
-import com.atilika.kuromoji.ipadic.Tokenizer.Builder;
 import org.embulk.config.Config;
 import org.embulk.config.ConfigDefault;
 import org.embulk.config.ConfigSource;
@@ -21,8 +18,14 @@ import org.embulk.spi.PageBuilder;
 import org.embulk.spi.PageOutput;
 import org.embulk.spi.PageReader;
 import org.embulk.spi.Schema;
+import org.embulk.spi.type.Type;
 import org.embulk.spi.type.Types;
+import org.msgpack.value.Value;
+import org.msgpack.value.ValueFactory;
 
+import com.atilika.kuromoji.ipadic.Token;
+import com.atilika.kuromoji.ipadic.Tokenizer;
+import com.atilika.kuromoji.ipadic.Tokenizer.Builder;
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
@@ -70,12 +73,13 @@ public class KuromojiFilterPlugin implements FilterPlugin
         for (String key : task.getKeyNames()) {
             for (Map<String, String> setting : task.getSettings()) {
                 String keyName = key + MoreObjects.firstNonNull(setting.get("suffix"), "");
+                Type type = "array".equals(setting.get("type")) ? Types.JSON : Types.STRING;
                 if (task.getKeepInput()) {
                     if (setting.get("suffix") != null) {
-                        builder.add(new Column(i++, keyName, Types.STRING));
+                        builder.add(new Column(i++, keyName, type));
                     }
                 } else {
-                    builder.add(new Column(i++, keyName, Types.STRING));
+                    builder.add(new Column(i++, keyName, type));
                 }
             }
         }
@@ -103,7 +107,7 @@ public class KuromojiFilterPlugin implements FilterPlugin
         final List<Column> keyNameColumns = Lists.newArrayList();
 
         for (String keyName : task.getKeyNames()) {
-            keyNameColumns.add(inputSchema.lookupColumn(keyName));
+            keyNameColumns.add(outputSchema.lookupColumn(keyName));
         }
 
         return new PageOutput() {
@@ -159,19 +163,25 @@ public class KuromojiFilterPlugin implements FilterPlugin
                         String suffix = setting.get("suffix");
                         String method = setting.get("method");
                         Column outputColumn = outputSchema.lookupColumn(column.getName() + MoreObjects.firstNonNull(suffix, ""));
-                        List<String> outputs = Lists.newArrayList();
+                        List<Value> outputs = Lists.newArrayList();
                         for (Token token : tokens) {
                             if (!isOkPartsOfSpeech(token)) { continue; }
+                            String word = null;
                             if ("base_form".equals(method)) {
-                                outputs.add(MoreObjects.firstNonNull(token.getBaseForm(), token.getSurface()));
+                                word = MoreObjects.firstNonNull(token.getBaseForm(), token.getSurface());
                             } else if ("reading".equals(method)) {
-                                outputs.add(MoreObjects.firstNonNull(token.getReading(), token.getSurface()));
+                                word = MoreObjects.firstNonNull(token.getReading(), token.getSurface());
                             } else if ("surface_form".equals(method)) {
-                                outputs.add(token.getSurface());
+                                word = token.getSurface();
                             }
+                            outputs.add(ValueFactory.newString(word));
                         }
-                        Joiner joiner = Joiner.on(MoreObjects.firstNonNull(setting.get("delimiter"), ",")).skipNulls();
-                        builder.setString(outputColumn, joiner.join(outputs));
+                        if (outputColumn.getType().equals(Types.STRING)) {
+                            Joiner joiner = Joiner.on(MoreObjects.firstNonNull(setting.get("delimiter"), ",")).skipNulls();
+                            builder.setString(outputColumn, joiner.join(outputs));
+                        } else if (outputColumn.getType().equals(Types.JSON)) {
+                            builder.setJson(outputColumn, ValueFactory.newArray(outputs));
+                        }
                     }
                 }
             }
