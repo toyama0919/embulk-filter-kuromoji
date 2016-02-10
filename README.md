@@ -18,6 +18,7 @@ see. [Atilika - Applied Search Innovation](http://www.atilika.com/en/products/ku
     - **suffix**: output column name suffix. if null overwrite column. (string, default: null)
     - **method**: description (string, required. surface_form or base_form or reading)
     - **delimiter**: delimiter (string, default: ",")
+    - **type**: extract data type, array or string. array is json type. (string, default: "string")
 
 ## Example
 
@@ -34,6 +35,7 @@ filters:
       - { suffix: _surface_form_no_delim, method: 'surface_form', delimiter: '' }
       - { suffix: _base_form, method: 'base_form', delimiter: '###' }
       - { suffix: _surface_form, method: 'surface_form', delimiter: '###' }
+      - { suffix: _array, method: 'surface_form', type: 'array' }
 ```
 
 ### input
@@ -51,7 +53,8 @@ As below
     "catchcopy" : "アンゼン・アンシンヲツイキュウシタキョクメンボディニデザインヲイッシン。",
     "catchcopy_surface_form_no_delim" : "安全・安心を追及した曲面ボディにデザインを一新。",
     "catchcopy_base_form" : "安全###・###安心###を###追及###する###た###曲面###ボディ###に###デザイン###を###一新###。",
-    "catchcopy_surface_form" : "安全###・###安心###を###追及###し###た###曲面###ボディ###に###デザイン###を###一新###。"
+    "catchcopy_surface_form" : "安全###・###安心###を###追及###し###た###曲面###ボディ###に###デザイン###を###一新###。",
+    "catchcopy_array" : ["安全","・","安心","を","追及","し","た","曲面","ボディ","に","デザイン","を","一新","。"]
 }
 ```
 
