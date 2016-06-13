@@ -31,6 +31,7 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 public class KuromojiFilterPlugin implements FilterPlugin
 {
@@ -62,11 +63,12 @@ public class KuromojiFilterPlugin implements FilterPlugin
         PluginTask task = config.loadConfig(PluginTask.class);
 
         ImmutableList.Builder<Column> builder = ImmutableList.builder();
+        Map<String, Column> map = Maps.newHashMap();
         int i = 0;
         if (task.getKeepInput()) {
             for (Column inputColumn : inputSchema.getColumns()) {
                 Column outputColumn = new Column(i++, inputColumn.getName(), inputColumn.getType());
-                builder.add(outputColumn);
+                map.put(inputColumn.getName(), outputColumn);
             }
         }
 
@@ -74,14 +76,14 @@ public class KuromojiFilterPlugin implements FilterPlugin
             for (Map<String, String> setting : task.getSettings()) {
                 String keyName = key + MoreObjects.firstNonNull(setting.get("suffix"), "");
                 Type type = "array".equals(setting.get("type")) ? Types.JSON : Types.STRING;
-                if (task.getKeepInput()) {
-                    if (setting.get("suffix") != null) {
-                        builder.add(new Column(i++, keyName, type));
-                    }
-                } else {
-                    builder.add(new Column(i++, keyName, type));
-                }
+                map.put(keyName, new Column(i++, keyName, type));
             }
+        }
+
+        i = 0;
+        for(Map.Entry<String, Column> e : map.entrySet()) {
+            final Column column = e.getValue();
+            builder.add(new Column(i++, column.getName(), column.getType()));
         }
 
         Schema outputSchema = new Schema(builder.build());
@@ -153,6 +155,8 @@ public class KuromojiFilterPlugin implements FilterPlugin
                             builder.setLong(inputColumn, reader.getLong(inputColumn));
                         } else if (Types.TIMESTAMP.equals(inputColumn.getType())) {
                             builder.setTimestamp(inputColumn, reader.getTimestamp(inputColumn));
+                        } else if (Types.JSON.equals(inputColumn.getType())) {
+                            builder.setJson(inputColumn, reader.getJson(inputColumn));
                         }
                     }
                 }
