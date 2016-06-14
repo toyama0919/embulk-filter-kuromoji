@@ -17,6 +17,7 @@ import org.embulk.spi.Schema;
 import org.embulk.spi.type.Types;
 import org.msgpack.value.Value;
 import org.msgpack.value.ValueFactory;
+import org.slf4j.Logger;
 
 import com.atilika.kuromoji.ipadic.Token;
 import com.atilika.kuromoji.ipadic.Tokenizer;
@@ -34,6 +35,7 @@ public class KuromojiPageOutput implements PageOutput
     private final PageBuilder builder;
     private final Schema inputSchema;
     private final Schema outputSchema;
+    private static final Logger logger = Exec.getLogger(KuromojiFilterPlugin.class);
 
     public KuromojiPageOutput(TaskSource taskSource, Schema inputSchema, Schema outputSchema, PageOutput output) {
         this.task = taskSource.loadTask(PluginTask.class);
@@ -106,13 +108,16 @@ public class KuromojiPageOutput implements PageOutput
         }
 
         for (Column column : keyNameColumns) {
-            List<Token> tokens = tokenizer.tokenize(reader.getString(column));
+            final String source = reader.getString(column);
+            List<Token> tokens = tokenizer.tokenize(source);
+            logger.debug("{} => {}", source, tokens);
             for (Map<String, String> setting : task.getSettings()) {
                 String suffix = setting.get("suffix");
                 String method = setting.get("method");
                 Column outputColumn = outputSchema.lookupColumn(column.getName() + MoreObjects.firstNonNull(suffix, ""));
                 List<Value> outputs = Lists.newArrayList();
                 for (Token token : tokens) {
+                    logger.debug("token => {}, {}", token, token.getAllFeatures());
                     if (!isOkPartsOfSpeech(token)) { continue; }
                     String word = null;
                     if ("base_form".equals(method)) {
