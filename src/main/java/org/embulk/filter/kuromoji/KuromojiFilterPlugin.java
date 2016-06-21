@@ -82,7 +82,7 @@ public class KuromojiFilterPlugin implements FilterPlugin
      */
     private List<Column> buildOutputColumns(PluginTask task, Schema inputSchema) {
         ImmutableList.Builder<Column> builder = ImmutableList.builder();
-        Map<String, Column> map = Maps.newHashMap();
+        Map<String, Column> map = Maps.newLinkedHashMap();
         int i = 0;
         if (task.getKeepInput()) {
             for (Column inputColumn : inputSchema.getColumns()) {
