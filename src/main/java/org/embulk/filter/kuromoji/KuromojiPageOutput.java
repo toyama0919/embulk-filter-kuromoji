@@ -20,6 +20,7 @@ import org.msgpack.value.Value;
 import org.msgpack.value.ValueFactory;
 import org.slf4j.Logger;
 
+import com.atilika.kuromoji.TokenizerBase.Mode;
 import com.atilika.kuromoji.ipadic.Token;
 import com.atilika.kuromoji.ipadic.Tokenizer;
 import com.atilika.kuromoji.ipadic.Tokenizer.Builder;
@@ -53,6 +54,17 @@ public class KuromojiPageOutput implements PageOutput
                 e.printStackTrace();
             }
         }
+
+        Mode mode = null;
+        if (task.getMode().equals("normal")) {
+            mode = Mode.NORMAL;
+        } else if (task.getMode().equals("search")) {
+            mode = Mode.SEARCH;
+        } else if (task.getMode().equals("extended")) {
+            mode = Mode.EXTENDED;
+        }
+
+        builder.mode(mode);
         this.tokenizer = builder.build();
         this.keyNameColumns = Lists.newArrayList();
 

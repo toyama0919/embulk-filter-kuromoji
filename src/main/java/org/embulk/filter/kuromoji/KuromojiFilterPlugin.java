@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.embulk.config.Config;
 import org.embulk.config.ConfigDefault;
+import org.embulk.config.ConfigInject;
 import org.embulk.config.ConfigSource;
 import org.embulk.config.Task;
 import org.embulk.config.TaskSource;
@@ -35,6 +36,10 @@ public class KuromojiFilterPlugin implements FilterPlugin
         @ConfigDefault("\"kuromoji\"")
         public String getTokenizer();
 
+        @Config("mode")
+        @ConfigDefault("\"normal\"")
+        public String getMode();
+        
         @Config("dictionary_path")
         @ConfigDefault("null")
         public Optional<String> getDictionaryPath();

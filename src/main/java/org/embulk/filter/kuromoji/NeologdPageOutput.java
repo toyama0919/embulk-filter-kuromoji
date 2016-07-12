@@ -72,7 +72,14 @@ public class NeologdPageOutput implements PageOutput
             e.printStackTrace();
         }
 
-        Mode mode = JapaneseTokenizer.Mode.NORMAL;
+        Mode mode = null;
+        if (task.getMode().equals("normal")) {
+            mode = JapaneseTokenizer.Mode.NORMAL;
+        } else if (task.getMode().equals("search")) {
+            mode = JapaneseTokenizer.Mode.SEARCH;
+        } else if (task.getMode().equals("extended")) {
+            mode = JapaneseTokenizer.Mode.EXTENDED;
+        }
         CharArraySet stopSet = JapaneseAnalyzer.getDefaultStopSet();
         Set<String> stopTags = JapaneseAnalyzer.getDefaultStopTags();
         this.japaneseAnalyzer = new JapaneseAnalyzer(userDict, mode, stopSet, stopTags);
