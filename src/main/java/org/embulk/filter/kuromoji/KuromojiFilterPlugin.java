@@ -38,7 +38,11 @@ public class KuromojiFilterPlugin implements FilterPlugin
         @Config("mode")
         @ConfigDefault("\"normal\"")
         public String getMode();
-        
+
+        @Config("use_stop_tag")
+        @ConfigDefault("false")
+        public boolean getUseStopTag();
+
         @Config("dictionary_path")
         @ConfigDefault("null")
         public Optional<String> getDictionaryPath();

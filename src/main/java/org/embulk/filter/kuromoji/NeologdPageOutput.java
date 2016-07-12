@@ -37,6 +37,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 
 public class NeologdPageOutput implements PageOutput
@@ -81,8 +82,13 @@ public class NeologdPageOutput implements PageOutput
         } else if (task.getMode().equals("extended")) {
             mode = JapaneseTokenizer.Mode.EXTENDED;
         }
-        CharArraySet stopSet = JapaneseAnalyzer.getDefaultStopSet();
-        Set<String> stopTags = JapaneseAnalyzer.getDefaultStopTags();
+
+        CharArraySet stopSet = null;
+        Set<String> stopTags = Sets.newHashSet();
+        if (task.getUseStopTag()) {
+            stopSet = JapaneseAnalyzer.getDefaultStopSet();
+            stopTags = JapaneseAnalyzer.getDefaultStopTags();
+        }
         this.japaneseAnalyzer = new JapaneseAnalyzer(userDict, mode, stopSet, stopTags);
     }
 
