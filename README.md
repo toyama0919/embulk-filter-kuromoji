@@ -100,6 +100,14 @@ As below
       - { suffix: _surface_form, method: 'surface_form', delimiter: '###' }
 ```
 
+## user dictionary exsample
+
+```
+西国分寺,西国分寺,ニシコクブンジ,駅名
+東京スカイツリー,東京 スカイツリー,トウキョウ スカイツリー,カスタム名詞
+```
+
+
 ## Build
 
 ```
