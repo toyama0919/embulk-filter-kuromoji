@@ -2,7 +2,6 @@ package org.embulk.filter.kuromoji;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
@@ -69,7 +68,7 @@ public class NeologdPageOutput implements PageOutput
             Reader reader = new InputStreamReader(new FileInputStream(file), Charsets.UTF_8);
             userDict = UserDictionary.open(reader);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("neologd error", e);
         }
 
         Mode mode = null;
@@ -190,7 +189,7 @@ public class NeologdPageOutput implements PageOutput
                 if (!isOkPartsOfSpeech(token)) { continue; }
                 list.add(token);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error("neologd error", e);
         }
         return list;
