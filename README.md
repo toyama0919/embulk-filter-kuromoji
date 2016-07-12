@@ -44,7 +44,7 @@ filters:
       - { suffix: _array, method: 'surface_form', type: 'array' }
 ```
 
-## Example
+## Pure kuromoji Example
 
 ```yaml
 filters:
