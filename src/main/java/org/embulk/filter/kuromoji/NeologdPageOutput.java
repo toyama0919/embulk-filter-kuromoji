@@ -63,12 +63,14 @@ public class NeologdPageOutput implements PageOutput
         this.builder = new PageBuilder(Exec.getBufferAllocator(), outputSchema, output);
 
         UserDictionary userDict = null;
-        try {
-            File file = new File(task.getDictionaryPath().get());
-            Reader reader = new InputStreamReader(new FileInputStream(file), Charsets.UTF_8);
-            userDict = UserDictionary.open(reader);
-        } catch (Exception e) {
-            logger.error("neologd error", e);
+        if (task.getDictionaryPath().isPresent()) {
+            try {
+                File file = new File(task.getDictionaryPath().get());
+                Reader reader = new InputStreamReader(new FileInputStream(file), Charsets.UTF_8);
+                userDict = UserDictionary.open(reader);
+            } catch (Exception e) {
+                logger.error("neologd error", e);
+            }
         }
 
         Mode mode = null;
