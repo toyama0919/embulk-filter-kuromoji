@@ -80,8 +80,8 @@ Gem::Specification.new do |spec|
   spec.name          = "${project.name}"
   spec.version       = "${project.version}"
   spec.authors       = ["toyama0919"]
-  spec.summary       = %[Kuromoji filter plugin for Embulk]
-  spec.description   = %[Kuromoji filter plugin for Embulk]
+  spec.summary       = %[Kuromoji filter plugin for Embulk. Neologd support.]
+  spec.description   = %[Kuromoji filter plugin for Embulk. Neologd support.]
   spec.email         = ["toyama0919@gmail.com"]
   spec.licenses      = ["MIT"]
   spec.homepage      = "https://github.com/toyama0919/embulk-filter-kuromoji"
