@@ -1,8 +1,12 @@
 # Kuromoji filter plugin for Embulk
 
 Kuromoji filter plugin for Embulk.
+Neologd support.
 
-see. [Atilika - Applied Search Innovation](http://www.atilika.com/en/products/kuromoji.html)
+## Reference
+
+* [Atilika - Applied Search Innovation](http://www.atilika.com/en/products/kuromoji.html)
+* [Home · neologd/mecab-ipadic-neologd Wiki](https://github.com/neologd/mecab-ipadic-neologd/wiki)
 
 ## Overview
 
@@ -10,6 +14,9 @@ see. [Atilika - Applied Search Innovation](http://www.atilika.com/en/products/ku
 
 ## Configuration
 
+- **tokenizer**: select tokenizer.(kuromoji or neologd) (string, default: kuromoji)
+- **mode**: select mode.(normal or search or extended) (string, default: normal)
+- **use_stop_tag**: neologd only.(bool, default: false)
 - **key_names**: description (list, required)
 - **keep_input**: keep input columns. (bool, default: `true`)
 - **ok_parts_of_speech**: ok parts of speech. (list, default: null)
@@ -20,12 +27,30 @@ see. [Atilika - Applied Search Innovation](http://www.atilika.com/en/products/ku
     - **delimiter**: delimiter (string, default: ",")
     - **type**: extract data type, array or string. array is json type. (string, default: "string")
 
+## Neologd Example
+
+```yaml
+filters:
+  - type: kuromoji
+    tokenizer: neologd
+    use_stop_tag: true
+    key_names:
+      - catchcopy
+    settings:
+      - { method: 'reading', delimiter: '' }
+      - { suffix: _surface_form_no_delim, method: 'surface_form', delimiter: '' }
+      - { suffix: _base_form, method: 'base_form', delimiter: '###' }
+      - { suffix: _surface_form, method: 'surface_form', delimiter: '###' }
+      - { suffix: _array, method: 'surface_form', type: 'array' }
+```
+
 ## Example
 
 ```yaml
 filters:
   - type: kuromoji
     keep_input: false
+    mode: search
     ok_parts_of_speech:
       - 名詞
     key_names:
