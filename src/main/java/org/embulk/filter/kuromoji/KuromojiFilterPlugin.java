@@ -31,6 +31,10 @@ public class KuromojiFilterPlugin implements FilterPlugin
         @Config("key_names")
         public List<String> getKeyNames();
 
+        @Config("tokenizer")
+        @ConfigDefault("\"kuromoji\"")
+        public String getTokenizer();
+
         @Config("dictionary_path")
         @ConfigDefault("null")
         public Optional<String> getDictionaryPath();
@@ -61,6 +65,9 @@ public class KuromojiFilterPlugin implements FilterPlugin
     @Override
     public PageOutput open(TaskSource taskSource, final Schema inputSchema, final Schema outputSchema, final PageOutput output)
     {
+        if (taskSource.loadTask(PluginTask.class).getTokenizer().equals("neologd")){
+            return new NeologdPageOutput(taskSource, inputSchema, outputSchema, output);
+        }
         return new KuromojiPageOutput(taskSource, inputSchema, outputSchema, output);
     }
 
