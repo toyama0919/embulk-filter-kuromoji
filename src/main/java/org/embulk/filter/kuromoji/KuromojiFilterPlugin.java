@@ -70,7 +70,9 @@ public class KuromojiFilterPlugin implements FilterPlugin
     @Override
     public PageOutput open(TaskSource taskSource, final Schema inputSchema, final Schema outputSchema, final PageOutput output)
     {
-        if (taskSource.loadTask(PluginTask.class).getTokenizer().equals("neologd")){
+        final String tokenizer = taskSource.loadTask(PluginTask.class).getTokenizer();
+        logger.info("Tokenizer => {}", tokenizer);
+        if (tokenizer.equals("neologd")){
             return new NeologdPageOutput(taskSource, inputSchema, outputSchema, output);
         }
         return new KuromojiPageOutput(taskSource, inputSchema, outputSchema, output);
