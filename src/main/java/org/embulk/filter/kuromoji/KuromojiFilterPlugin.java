@@ -75,7 +75,7 @@ public class KuromojiFilterPlugin implements FilterPlugin
     {
         final String tokenizer = taskSource.loadTask(PluginTask.class).getTokenizer();
         logger.info("Tokenizer => {}", tokenizer);
-        if (tokenizer.equals("neologd")){
+        if (tokenizer.equals("neologd")) {
             return new NeologdPageOutput(taskSource, inputSchema, outputSchema, output);
         }
         return new KuromojiPageOutput(taskSource, inputSchema, outputSchema, output);
@@ -86,7 +86,8 @@ public class KuromojiFilterPlugin implements FilterPlugin
      * @param task
      * @return
      */
-    private Schema buildOutputSchema(PluginTask task, Schema inputSchema) {
+    private Schema buildOutputSchema(PluginTask task, Schema inputSchema)
+    {
         final List<Column> outputColumns = buildOutputColumns(task, inputSchema);
         logger.debug("outputColumns => {}", outputColumns);
         return new Schema(outputColumns);
@@ -97,7 +98,8 @@ public class KuromojiFilterPlugin implements FilterPlugin
      * @param inputSchema
      * @return
      */
-    private List<Column> buildOutputColumns(PluginTask task, Schema inputSchema) {
+    private List<Column> buildOutputColumns(PluginTask task, Schema inputSchema)
+    {
         ImmutableList.Builder<Column> builder = ImmutableList.builder();
         Map<String, Column> map = Maps.newLinkedHashMap();
         int i = 0;
@@ -117,7 +119,7 @@ public class KuromojiFilterPlugin implements FilterPlugin
         }
 
         i = 0;
-        for(Map.Entry<String, Column> e : map.entrySet()) {
+        for (Map.Entry<String, Column> e : map.entrySet()) {
             final Column column = e.getValue();
             builder.add(new Column(i++, column.getName(), column.getType()));
         }

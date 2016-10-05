@@ -39,7 +39,6 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-
 public class NeologdPageOutput implements PageOutput
 {
     private final KuromojiFilterPlugin.PluginTask task;
@@ -51,7 +50,8 @@ public class NeologdPageOutput implements PageOutput
     private final JapaneseAnalyzer japaneseAnalyzer;
     private static final Logger logger = Exec.getLogger(KuromojiFilterPlugin.class);
 
-    public NeologdPageOutput(TaskSource taskSource, Schema inputSchema, Schema outputSchema, PageOutput output) {
+    public NeologdPageOutput(TaskSource taskSource, Schema inputSchema, Schema outputSchema, PageOutput output)
+    {
         this.task = taskSource.loadTask(PluginTask.class);
         this.inputSchema = inputSchema;
         this.outputSchema = outputSchema;
@@ -69,7 +69,8 @@ public class NeologdPageOutput implements PageOutput
                 File file = new File(task.getDictionaryPath().get());
                 Reader reader = new InputStreamReader(new FileInputStream(file), Charsets.UTF_8);
                 userDict = UserDictionary.open(reader);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 logger.error("neologd error", e);
             }
         }
@@ -77,9 +78,11 @@ public class NeologdPageOutput implements PageOutput
         Mode mode = null;
         if (task.getMode().equals("normal")) {
             mode = JapaneseTokenizer.Mode.NORMAL;
-        } else if (task.getMode().equals("search")) {
+        }
+        else if (task.getMode().equals("search")) {
             mode = JapaneseTokenizer.Mode.SEARCH;
-        } else if (task.getMode().equals("extended")) {
+        }
+        else if (task.getMode().equals("extended")) {
             mode = JapaneseTokenizer.Mode.EXTENDED;
         }
 
@@ -93,17 +96,20 @@ public class NeologdPageOutput implements PageOutput
     }
 
     @Override
-    public void finish() {
+    public void finish()
+    {
         builder.finish();
     }
 
     @Override
-    public void close() {
+    public void close()
+    {
         builder.close();
     }
 
     @Override
-    public void add(Page page) {
+    public void add(Page page)
+    {
         reader.setPage(page);
         while (reader.nextRecord()) {
             setValue(builder);
@@ -114,7 +120,8 @@ public class NeologdPageOutput implements PageOutput
     /**
      * @param builder
      */
-    private void setValue(PageBuilder builder) {
+    private void setValue(PageBuilder builder)
+    {
         if (task.getKeepInput()) {
             for (Column inputColumn : inputSchema.getColumns()) {
                 if (reader.isNull(inputColumn)) {
@@ -123,15 +130,20 @@ public class NeologdPageOutput implements PageOutput
                 }
                 if (Types.STRING.equals(inputColumn.getType())) {
                     builder.setString(inputColumn, reader.getString(inputColumn));
-                } else if (Types.BOOLEAN.equals(inputColumn.getType())) {
+                }
+                else if (Types.BOOLEAN.equals(inputColumn.getType())) {
                     builder.setBoolean(inputColumn, reader.getBoolean(inputColumn));
-                } else if (Types.DOUBLE.equals(inputColumn.getType())) {
+                }
+                else if (Types.DOUBLE.equals(inputColumn.getType())) {
                     builder.setDouble(inputColumn, reader.getDouble(inputColumn));
-                } else if (Types.LONG.equals(inputColumn.getType())) {
+                }
+                else if (Types.LONG.equals(inputColumn.getType())) {
                     builder.setLong(inputColumn, reader.getLong(inputColumn));
-                } else if (Types.TIMESTAMP.equals(inputColumn.getType())) {
+                }
+                else if (Types.TIMESTAMP.equals(inputColumn.getType())) {
                     builder.setTimestamp(inputColumn, reader.getTimestamp(inputColumn));
-                } else if (Types.JSON.equals(inputColumn.getType())) {
+                }
+                else if (Types.JSON.equals(inputColumn.getType())) {
                     builder.setJson(inputColumn, reader.getJson(inputColumn));
                 }
             }
@@ -149,9 +161,11 @@ public class NeologdPageOutput implements PageOutput
                     String word = null;
                     if ("base_form".equals(method)) {
                         word = token.getBaseForm();
-                    } else if ("reading".equals(method)) {
+                    }
+                    else if ("reading".equals(method)) {
                         word = token.getReading();
-                    } else if ("surface_form".equals(method)) {
+                    }
+                    else if ("surface_form".equals(method)) {
                         word = token.getCharTerm();
                     }
                     if (word != null) {
@@ -161,16 +175,20 @@ public class NeologdPageOutput implements PageOutput
                 if (outputColumn.getType().equals(Types.STRING)) {
                     Joiner joiner = Joiner.on(MoreObjects.firstNonNull(setting.get("delimiter"), ",")).skipNulls();
                     builder.setString(outputColumn, joiner.join(outputs));
-                } else if (outputColumn.getType().equals(Types.JSON)) {
+                }
+                else if (outputColumn.getType().equals(Types.JSON)) {
                     builder.setJson(outputColumn, ValueFactory.newArray(outputs));
                 }
             }
         }
     }
 
-    private boolean isOkPartsOfSpeech(Token token) {
+    private boolean isOkPartsOfSpeech(Token token)
+    {
         logger.debug("{} => {}", token.getCharTerm(), token.getPartOfSpeech());
-        if (!task.getOkPartsOfSpeech().isPresent()) { return true; };
+        if (!task.getOkPartsOfSpeech().isPresent()) {
+            return true;
+        }
         for (String okPartsOfSpeech : task.getOkPartsOfSpeech().get()) {
             if (token.getPartOfSpeech().startsWith(okPartsOfSpeech)) {
                 return true;
@@ -179,9 +197,10 @@ public class NeologdPageOutput implements PageOutput
         return false;
     }
 
-    private List<Token> tokenize(Reader reader) {
+    private List<Token> tokenize(Reader reader)
+    {
         List<Token> list = Lists.newArrayList();
-        try (TokenStream tokenStream = japaneseAnalyzer.tokenStream("", reader) ) {
+        try (TokenStream tokenStream = japaneseAnalyzer.tokenStream("", reader)) {
             BaseFormAttribute baseAttr = tokenStream.addAttribute(BaseFormAttribute.class);
             CharTermAttribute charAttr = tokenStream.addAttribute(CharTermAttribute.class);
             PartOfSpeechAttribute posAttr = tokenStream.addAttribute(PartOfSpeechAttribute.class);
@@ -194,10 +213,13 @@ public class NeologdPageOutput implements PageOutput
                 token.setBaseForm(baseAttr.getBaseForm());
                 token.setReading(readAttr.getReading());
                 token.setPartOfSpeech(posAttr.getPartOfSpeech());
-                if (!isOkPartsOfSpeech(token)) { continue; }
+                if (!isOkPartsOfSpeech(token)) {
+                    continue;
+                }
                 list.add(token);
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             logger.error("neologd error", e);
         }
         return list;

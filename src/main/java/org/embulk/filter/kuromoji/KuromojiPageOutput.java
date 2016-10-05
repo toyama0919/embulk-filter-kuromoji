@@ -39,7 +39,8 @@ public class KuromojiPageOutput implements PageOutput
     private final Schema outputSchema;
     private static final Logger logger = Exec.getLogger(KuromojiFilterPlugin.class);
 
-    public KuromojiPageOutput(TaskSource taskSource, Schema inputSchema, Schema outputSchema, PageOutput output) {
+    public KuromojiPageOutput(TaskSource taskSource, Schema inputSchema, Schema outputSchema, PageOutput output)
+    {
         this.task = taskSource.loadTask(PluginTask.class);
         this.inputSchema = inputSchema;
         this.outputSchema = outputSchema;
@@ -48,9 +49,11 @@ public class KuromojiPageOutput implements PageOutput
         if (task.getDictionaryPath().isPresent()) {
             try {
                 builder.userDictionary(task.getDictionaryPath().get());
-            } catch (FileNotFoundException e) {
+            }
+            catch (FileNotFoundException e) {
                 e.printStackTrace();
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -58,9 +61,11 @@ public class KuromojiPageOutput implements PageOutput
         Mode mode = null;
         if (task.getMode().equals("normal")) {
             mode = Mode.NORMAL;
-        } else if (task.getMode().equals("search")) {
+        }
+        else if (task.getMode().equals("search")) {
             mode = Mode.SEARCH;
-        } else if (task.getMode().equals("extended")) {
+        }
+        else if (task.getMode().equals("extended")) {
             mode = Mode.EXTENDED;
         }
 
@@ -76,17 +81,20 @@ public class KuromojiPageOutput implements PageOutput
     }
 
     @Override
-    public void finish() {
+    public void finish()
+    {
         builder.finish();
     }
 
     @Override
-    public void close() {
+    public void close()
+    {
         builder.close();
     }
 
     @Override
-    public void add(Page page) {
+    public void add(Page page)
+    {
         reader.setPage(page);
         while (reader.nextRecord()) {
             setValue(builder);
@@ -97,7 +105,8 @@ public class KuromojiPageOutput implements PageOutput
     /**
      * @param builder
      */
-    private void setValue(PageBuilder builder) {
+    private void setValue(PageBuilder builder)
+    {
         if (task.getKeepInput()) {
             for (Column inputColumn : inputSchema.getColumns()) {
                 if (reader.isNull(inputColumn)) {
@@ -106,15 +115,20 @@ public class KuromojiPageOutput implements PageOutput
                 }
                 if (Types.STRING.equals(inputColumn.getType())) {
                     builder.setString(inputColumn, reader.getString(inputColumn));
-                } else if (Types.BOOLEAN.equals(inputColumn.getType())) {
+                }
+                else if (Types.BOOLEAN.equals(inputColumn.getType())) {
                     builder.setBoolean(inputColumn, reader.getBoolean(inputColumn));
-                } else if (Types.DOUBLE.equals(inputColumn.getType())) {
+                }
+                else if (Types.DOUBLE.equals(inputColumn.getType())) {
                     builder.setDouble(inputColumn, reader.getDouble(inputColumn));
-                } else if (Types.LONG.equals(inputColumn.getType())) {
+                }
+                else if (Types.LONG.equals(inputColumn.getType())) {
                     builder.setLong(inputColumn, reader.getLong(inputColumn));
-                } else if (Types.TIMESTAMP.equals(inputColumn.getType())) {
+                }
+                else if (Types.TIMESTAMP.equals(inputColumn.getType())) {
                     builder.setTimestamp(inputColumn, reader.getTimestamp(inputColumn));
-                } else if (Types.JSON.equals(inputColumn.getType())) {
+                }
+                else if (Types.JSON.equals(inputColumn.getType())) {
                     builder.setJson(inputColumn, reader.getJson(inputColumn));
                 }
             }
@@ -131,13 +145,17 @@ public class KuromojiPageOutput implements PageOutput
                 List<Value> outputs = Lists.newArrayList();
                 for (Token token : tokens) {
                     logger.debug("token => {}, {}", token, token.getAllFeatures());
-                    if (!isOkPartsOfSpeech(token)) { continue; }
+                    if (!isOkPartsOfSpeech(token)) {
+                        continue;
+                    }
                     String word = null;
                     if ("base_form".equals(method)) {
                         word = MoreObjects.firstNonNull(token.getBaseForm(), token.getSurface());
-                    } else if ("reading".equals(method)) {
+                    }
+                    else if ("reading".equals(method)) {
                         word = MoreObjects.firstNonNull(token.getReading(), token.getSurface());
-                    } else if ("surface_form".equals(method)) {
+                    }
+                    else if ("surface_form".equals(method)) {
                         word = token.getSurface();
                     }
                     outputs.add(ValueFactory.newString(word));
@@ -145,15 +163,19 @@ public class KuromojiPageOutput implements PageOutput
                 if (outputColumn.getType().equals(Types.STRING)) {
                     Joiner joiner = Joiner.on(MoreObjects.firstNonNull(setting.get("delimiter"), ",")).skipNulls();
                     builder.setString(outputColumn, joiner.join(outputs));
-                } else if (outputColumn.getType().equals(Types.JSON)) {
+                }
+                else if (outputColumn.getType().equals(Types.JSON)) {
                     builder.setJson(outputColumn, ValueFactory.newArray(outputs));
                 }
             }
         }
     }
 
-    private boolean isOkPartsOfSpeech(Token token) {
-        if (!task.getOkPartsOfSpeech().isPresent()) { return true; };
+    private boolean isOkPartsOfSpeech(Token token)
+    {
+        if (!task.getOkPartsOfSpeech().isPresent()) {
+            return true;
+        }
         for (String okPartsOfSpeech : task.getOkPartsOfSpeech().get()) {
             if (token.getAllFeaturesArray()[0].equals(okPartsOfSpeech)) {
                 return true;

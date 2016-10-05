@@ -8,34 +8,44 @@ public class Token
     private String reading;
     private String inflection;
 
-    public String getCharTerm() {
+    public String getCharTerm()
+    {
         return charTerm;
     }
-    public String getBaseForm() {
+    public String getBaseForm()
+    {
         return baseForm;
     }
-    public String getPartOfSpeech() {
+    public String getPartOfSpeech()
+    {
         return partOfSpeech;
     }
-    public void setCharTerm(String charTerm) {
+    public void setCharTerm(String charTerm)
+    {
         this.charTerm = charTerm;
     }
-    public void setBaseForm(String baseForm) {
+    public void setBaseForm(String baseForm)
+    {
         this.baseForm = baseForm;
     }
-    public void setPartOfSpeech(String partOfSpeech) {
+    public void setPartOfSpeech(String partOfSpeech)
+    {
         this.partOfSpeech = partOfSpeech;
     }
-    public void setReading(String reading) {
+    public void setReading(String reading)
+    {
         this.reading = reading;
     }
-    public String getReading() {
+    public String getReading()
+    {
         return reading;
     }
-    public String getInflection() {
+    public String getInflection()
+    {
         return inflection;
     }
-    public void setInflection(String inflection) {
+    public void setInflection(String inflection)
+    {
         this.inflection = inflection;
     }
 }
