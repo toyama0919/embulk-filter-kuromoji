@@ -23,12 +23,12 @@ sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
 dependencies {
-    compile  "org.embulk:embulk-core:0.8.15"
+    compile  "org.embulk:embulk-core:0.8.18"
     compile 'com.atilika.kuromoji:kuromoji-ipadic:0.9.0'
     compile "org.codelibs:lucene-analyzers-kuromoji-ipadic-neologd:6.2.1-20161201"
-    provided "org.embulk:embulk-core:0.8.15"
+    provided "org.embulk:embulk-core:0.8.18"
     testCompile "junit:junit:4.+"
-    testCompile  "org.embulk:embulk-core:0.8.15"
+    testCompile  "org.embulk:embulk-core:0.8.18"
 }
 
 task classpath(type: Copy, dependsOn: ["jar"]) {
