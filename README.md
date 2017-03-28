@@ -1,4 +1,5 @@
 # Kuromoji filter plugin for Embulk
+[![Gem Version](https://badge.fury.io/rb/embulk-filter-kuromoji.svg)](http://badge.fury.io/rb/embulk-filter-kuromoji)
 
 Kuromoji filter plugin for Embulk.
 Neologd support.
