@@ -101,7 +101,7 @@ As below
       - { suffix: _surface_form, method: 'surface_form', delimiter: '###' }
 ```
 
-## user dictionary exsample
+## user dictionary example
 
 ```
 西国分寺,西国分寺,ニシコクブンジ,駅名
